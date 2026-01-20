@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Vuelidate 実習</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-demi"></script>
+    <script src="https://unpkg.com/@vuelidate/core"></script>
+    <script src="https://unpkg.com/@vuelidate/validators"></script>
+</head>
+<body>
+    <div id="app" class="container mt-5">
+        <h1 class="bg-primary text-white display-4 px-3">バリデーションの実装</h1>
+        
+        <div class="form-group mt-4">
+            <label>名前（4文字以上）：</label>
+            <input type="text" v-model="state.myName" 
+                   class="form-control form-control-lg" 
+                   :class="{'is-invalid': v$.myName.$error}">
+            
+            <div v-if="v$.myName.$error" class="invalid-feedback">
+                名前は4文字以上で入力してください。
+            </div>
+        </div>
+
+        <button @click="submitForm" class="btn btn-success btn-lg">送信</button>
+    </div>
+
+    <script>
+    const { createApp, reactive } = Vue;
+
+    const app = createApp({
+        setup() {
+            const state = reactive({
+                myName: ''
+            });
+
+            // ライブラリを確実に取り出す
+            const useVuelidate = window.Vuelidate.useVuelidate;
+            const { required, minLength } = window.VuelidateValidators;
+
+            const rules = {
+                myName: { required, minLength: minLength(4) }
+            };
+
+            const v$ = useVuelidate(rules, state);
+
+            const submitForm = async () => {
+                const isFormCorrect = await v$.value.$validate();
+                if (isFormCorrect) {
+                    alert('送信成功！');
+                } else {
+                    alert('エラー：入力内容を確認してください。');
+                }
+            };
+
+            return { state, v$, submitForm };
+        }
+    });
+    app.mount('#app');
+    </script>
+</body>
+</html>

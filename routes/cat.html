@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>猫リスト：レスポンシブ対応版</title>
+    <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios@0.23.0/dist/axios.min.js"></script>
+    <style>
+        /* 全体の背景と余白 */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { color: #333; }
+
+        /* ボタンのデザイン */
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            margin-bottom: 30px;
+        }
+
+        button:hover { background-color: #e68a00; transform: translateY(-2px); }
+
+        /* --- ここからがレスポンシブの核心（Flexbox） --- */
+        .cat-container {
+            display: flex;
+            flex-wrap: wrap;    /* 画面幅が狭い時に自動で折り返す */
+            justify-content: center;
+            gap: 20px;          /* カード同士の隙間 */
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        /* カードの設定：スマホでは1枚、PCでは横に並ぶ */
+        .cat-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            width: 100%;        /* デフォルト（スマホ）は幅100% */
+            max-width: 300px;   /* 大きくなりすぎないように制限 */
+            text-align: center;
+            padding-bottom: 15px;
+        }
+
+        /* 画像を枠いっぱいに広げ、高さは自動調整（レスポンシブ画像） */
+        .cat-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;  /* 画像の比率を保ったまま枠を埋める */
+        }
+
+        .cat-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>🐱 猫のレスポンシブ名簿</h1>
+        <button @click="getCats">データを読み込む</button>
+
+        <div class="cat-container">
+            <div v-for="cat in cats" :key="cat.name" class="cat-card">
+                <img :src="cat.image" :alt="cat.name">
+                <div class="cat-name">{{ cat.name }}</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return { cats: [] }
+            },
+            methods: {
+                getCats() {
+                    axios.get('http://localhost:30032/cat')
+                    .then(res => { this.cats = res.data; })
+                    .catch(err => { alert("サーバーから応答がありません"); });
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MongoDBデータ表示</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>連絡先リスト</h1>
+        <button @click="fetchData">DBから取得</button>
+        <hr>
+        <ul>
+            <li v-for="item in items" :key="item._id">
+                {{ item.name }} (メール: {{ item.mail }}, TEL: {{ item.tel }})
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    items: []
+                }
+            },
+            methods: {
+                async fetchData() {
+                    try {
+                        // notes_from_b というAPI（URL）からデータを取ってくる命令
+                        const response = await fetch('/notes_from_b');
+                        this.items = await response.json();
+                    } catch (e) {
+                        alert("データが取得できませんでした。サーバーを起動していますか？");
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
